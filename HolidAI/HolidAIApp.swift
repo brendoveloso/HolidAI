@@ -1,10 +1,3 @@
-//
-//  HolidAIApp.swift
-//  HolidAI
-//
-//  Created by Brendo Veloso on 02/07/26.
-//
-
 import SwiftUI
 import SwiftData
 
@@ -12,7 +5,8 @@ import SwiftData
 struct HolidAIApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Contract.self,
+            HolidayCache.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 

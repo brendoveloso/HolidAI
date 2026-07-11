@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		797D2EE22FF99CC8007F9090 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 797D2EE12FF99CC8007F9090 /* Secrets.xcconfig */; };
+		797D2EE42FF99DFA007F9090 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 797D2EE32FF99DFA007F9090 /* .gitignore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		79CF38392FF7204C004EF47B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,14 +29,29 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		797D2EE12FF99CC8007F9090 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
+		797D2EE32FF99DFA007F9090 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		79CF38292FF7204B004EF47B /* HolidAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HolidAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		79CF38382FF7204C004EF47B /* HolidAITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HolidAITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		79CF38422FF7204C004EF47B /* HolidAIUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HolidAIUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		797D2EE62FF99EE5007F9090 /* Exceptions for "HolidAI" folder in "HolidAI" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 79CF38282FF7204B004EF47B /* HolidAI */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		79CF382B2FF7204B004EF47B /* HolidAI */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				797D2EE62FF99EE5007F9090 /* Exceptions for "HolidAI" folder in "HolidAI" target */,
+			);
 			path = HolidAI;
 			sourceTree = "<group>";
 		};
@@ -75,6 +95,8 @@
 		79CF38202FF7204B004EF47B = {
 			isa = PBXGroup;
 			children = (
+				797D2EE32FF99DFA007F9090 /* .gitignore */,
+				797D2EE12FF99CC8007F9090 /* Secrets.xcconfig */,
 				79CF382B2FF7204B004EF47B /* HolidAI */,
 				79CF383B2FF7204C004EF47B /* HolidAITests */,
 				79CF38452FF7204C004EF47B /* HolidAIUITests */,
@@ -212,6 +234,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				797D2EE22FF99CC8007F9090 /* Secrets.xcconfig in Resources */,
+				797D2EE42FF99DFA007F9090 /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -271,6 +295,7 @@
 /* Begin XCBuildConfiguration section */
 		79CF384A2FF7204C004EF47B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 797D2EE12FF99CC8007F9090 /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -334,6 +359,7 @@
 		};
 		79CF384B2FF7204C004EF47B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 797D2EE12FF99CC8007F9090 /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -397,6 +423,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HolidAI/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -428,6 +455,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HolidAI/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
