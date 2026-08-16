@@ -35,7 +35,6 @@ struct DashboardView: View {
                 } else if viewModel.holidays.isEmpty {
                     ContentUnavailableView("Nenhum feriado encontrado", systemImage: "calendar.badge.exclamationmark")
                 } else {
-                    // Lista moderna dividida por seções ou direta
                     List(viewModel.holidays) { holiday in
                         HStack(spacing: 16) {
                             // Badge visual para a data (estilo calendário)
