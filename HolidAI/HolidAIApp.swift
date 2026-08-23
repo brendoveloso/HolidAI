@@ -5,13 +5,20 @@ import SwiftData
 struct HolidAIApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Contract.self,
-            HolidayCache.self
+            Contract.self
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        let isUITesting = ProcessInfo.processInfo.arguments.contains("-ui-testing")
+        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: isUITesting)
 
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
+            if isUITesting && ProcessInfo.processInfo.arguments.contains("-ui-seed-contracts") {
+                let context = ModelContext(container)
+                context.insert(Contract(companyName: "Banco Ágil", state: "SP", city: "São Paulo", employmentType: .banking))
+                context.insert(Contract(companyName: "Estúdio Aurora", state: "RJ", city: "Rio de Janeiro", employmentType: .pj))
+                try context.save()
+            }
+            return container
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
@@ -19,7 +26,11 @@ struct HolidAIApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if ProcessInfo.processInfo.arguments.contains("-ui-testing") {
+                ContentView(repository: DefaultHolidayRepository(service: MockHolidayService()))
+            } else {
+                ContentView()
+            }
         }
         .modelContainer(sharedModelContainer)
     }

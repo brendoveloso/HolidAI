@@ -10,15 +10,21 @@ final class RegisterViewModel {
     var companyName: String = ""
     var selectedState: String = ""
     var selectedCity: String = "Capital"
-    var selectedEmploymentType: String = "CLT"
+    var selectedEmploymentType: EmploymentType = .clt
     
     var isLoading: Bool = false
     var errorMessage: String? = nil
     
     private let holidayService: HolidayService
     
-    init(holidayService: HolidayService) {
+    init(holidayService: HolidayService, contract: Contract? = nil) {
         self.holidayService = holidayService
+        if let contract {
+            companyName = contract.companyName
+            selectedState = contract.state
+            selectedCity = contract.city
+            selectedEmploymentType = contract.employmentType
+        }
     }
     
     func loadStates() async {
@@ -37,14 +43,20 @@ final class RegisterViewModel {
         isLoading = false
     }
     
-    func saveContract(context: ModelContext) {
-        let newContract = Contract(
-            companyName: companyName,
-            country: "BR",
-            state: selectedState,
-            city: selectedCity,
-            employmentType: selectedEmploymentType
-        )
-        context.insert(newContract)
+    func saveContract(_ contract: Contract?, context: ModelContext) {
+        if let contract {
+            contract.companyName = companyName.trimmingCharacters(in: .whitespacesAndNewlines)
+            contract.state = selectedState
+            contract.city = selectedCity
+            contract.employmentType = selectedEmploymentType
+        } else {
+            context.insert(Contract(
+                companyName: companyName.trimmingCharacters(in: .whitespacesAndNewlines),
+                country: "BR",
+                state: selectedState,
+                city: selectedCity,
+                employmentType: selectedEmploymentType
+            ))
+        }
     }
 }
