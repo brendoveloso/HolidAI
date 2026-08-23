@@ -10,15 +10,18 @@ struct RegisterView: View {
     
     // Instancia ViewModel
     @State private var viewModel: RegisterViewModel
+    private let contract: Contract?
     
     @MainActor
-    init() {
-        let service = RealHolidayService()
-        _viewModel = State(initialValue: RegisterViewModel(holidayService: service))
+    init(contract: Contract? = nil, holidayService: (any HolidayService)? = nil) {
+        self.contract = contract
+        let defaultService: any HolidayService = ProcessInfo.processInfo.arguments.contains("-ui-testing")
+            ? MockHolidayService()
+            : RealHolidayService()
+        _viewModel = State(initialValue: RegisterViewModel(holidayService: holidayService ?? defaultService, contract: contract))
     }
     
     // Opções estáticas para os outros Pickers
-    let employmentTypes: [String] = ["CLT", "Bancário", "PJ"]
     var cityOptions: [String] {
         if let capital = CapitalIBGEMapper.getCapitalName(for: viewModel.selectedState) {
             return [capital, "Outra Cidade"]
@@ -31,8 +34,8 @@ struct RegisterView: View {
             Form {
                 Section(header: Text("Regime de Trabalho")) {
                     Picker("Categoria", selection: $viewModel.selectedEmploymentType) {
-                        ForEach(employmentTypes, id: \.self) { employmentType in
-                            Text(employmentType).tag(employmentType)
+                        ForEach(EmploymentType.allCases) { employmentType in
+                            Text(employmentType.localizedName).tag(employmentType)
                         }
                     }
                 }
@@ -82,7 +85,7 @@ struct RegisterView: View {
                 
                 
             }
-            .navigationTitle("Novo Contrato")
+            .navigationTitle(contract == nil ? "Novo Contrato" : "Editar Contrato")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -93,11 +96,11 @@ struct RegisterView: View {
                 
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Salvar") {
-                        viewModel.saveContract(context: modelContext)
+                        viewModel.saveContract(contract, context: modelContext)
                         dismiss()
                     }
                     // O botão só fica ativo se preencher o nome e escolher o estado
-                    .disabled(viewModel.companyName.isEmpty || viewModel.selectedState.isEmpty)
+                    .disabled(viewModel.companyName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || viewModel.selectedState.isEmpty)
                 }
             }
             // Dispara a requisição para a API exatamente quando a tela aparece

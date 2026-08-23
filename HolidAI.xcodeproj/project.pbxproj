@@ -6,11 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		797D2EE22FF99CC8007F9090 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 797D2EE12FF99CC8007F9090 /* Secrets.xcconfig */; };
-		797D2EE42FF99DFA007F9090 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 797D2EE32FF99DFA007F9090 /* .gitignore */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		79CF38392FF7204C004EF47B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -234,8 +229,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				797D2EE22FF99CC8007F9090 /* Secrets.xcconfig in Resources */,
-				797D2EE42FF99DFA007F9090 /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

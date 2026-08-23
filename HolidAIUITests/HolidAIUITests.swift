@@ -1,41 +1,96 @@
-//
-//  HolidAIUITests.swift
-//  HolidAIUITests
-//
-//  Created by Brendo Veloso on 02/07/26.
-//
-
 import XCTest
 
 final class HolidAIUITests: XCTestCase {
-
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-
-        // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
-
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
-    }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
     @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
-        let app = XCUIApplication()
+    func testTabsProfileAndEmptyContractAction() throws {
+        let app = makeApp()
         app.launch()
 
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        let compactTabBar = app.tabBars.firstMatch
+        if compactTabBar.exists {
+            XCTAssertEqual(compactTabBar.buttons.count, 4)
+            XCTAssertTrue(compactTabBar.buttons["Início"].exists)
+            XCTAssertTrue(compactTabBar.buttons["Feriados"].exists)
+            XCTAssertTrue(compactTabBar.buttons["Contratos"].exists)
+        } else {
+            XCTAssertTrue(app.buttons["Início"].exists)
+            XCTAssertTrue(app.buttons["Feriados"].exists)
+            XCTAssertTrue(app.buttons["Contratos"].exists)
+        }
+        XCTAssertTrue(app.buttons["Perfil"].exists)
+        XCTAssertTrue(app.buttons["Adicionar contrato"].exists)
+
+        if compactTabBar.exists {
+            compactTabBar.buttons.element(boundBy: 3).tap()
+            XCTAssertTrue(app.searchFields.firstMatch.waitForExistence(timeout: 2))
+            compactTabBar.buttons["Início"].tap()
+            XCTAssertTrue(compactTabBar.buttons["Início"].isSelected)
+        }
+
+        app.buttons["Perfil"].tap()
+        XCTAssertTrue(app.navigationBars["Perfil"].waitForExistence(timeout: 2))
+    }
+
+    @MainActor
+    func testCreatesFirstContract() throws {
+        let app = makeApp()
+        app.launch()
+
+        app.buttons["Adicionar contrato"].tap()
+        let companyField = app.textFields["Nome da Empresa (Ex: Nubank)"]
+        XCTAssertTrue(companyField.waitForExistence(timeout: 2))
+        companyField.tap()
+        companyField.typeText("Empresa Teste")
+
+        let statePicker = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Estado'")).firstMatch
+        XCTAssertTrue(statePicker.exists)
+        statePicker.tap()
+        XCTAssertTrue(app.buttons["São Paulo"].waitForExistence(timeout: 2))
+        app.buttons["São Paulo"].tap()
+        app.buttons["Salvar"].tap()
+
+        XCTAssertTrue(app.staticTexts["Empresa Teste"].waitForExistence(timeout: 3))
+    }
+
+    @MainActor
+    func testMultipleContractsAndSearchDestinations() throws {
+        let app = makeApp(seedContracts: true)
+        app.launch()
+
+        app.tabBars.buttons["Contratos"].tap()
+        XCTAssertTrue(app.staticTexts["Banco Ágil"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Estúdio Aurora"].exists)
+
+        app.tabBars.buttons.element(boundBy: 3).tap()
+        let searchField = app.searchFields.firstMatch
+        XCTAssertTrue(searchField.waitForExistence(timeout: 2))
+        searchField.typeText("bancario")
+        XCTAssertTrue(app.staticTexts["Banco Ágil"].waitForExistence(timeout: 2))
+        app.staticTexts["Banco Ágil"].tap()
+        XCTAssertTrue(app.navigationBars["Banco Ágil"].waitForExistence(timeout: 2))
+
+        app.tabBars.buttons.element(boundBy: 3).tap()
+        let holidaySearchField = app.searchFields.firstMatch
+        XCTAssertTrue(holidaySearchField.waitForExistence(timeout: 2))
+        holidaySearchField.typeText("Natal")
+        XCTAssertTrue(app.staticTexts["Natal"].waitForExistence(timeout: 2))
+        app.staticTexts["Natal"].tap()
+        XCTAssertTrue(app.navigationBars["Natal"].waitForExistence(timeout: 2))
     }
 
     @MainActor
     func testLaunchPerformance() throws {
-        // This measures how long it takes to launch your application.
-        measure(metrics: [XCTApplicationLaunchMetric()]) {
-            XCUIApplication().launch()
-        }
+        measure(metrics: [XCTApplicationLaunchMetric()]) { makeApp().launch() }
+    }
+
+    private func makeApp(seedContracts: Bool = false) -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launchArguments = ["-ui-testing"]
+        if seedContracts { app.launchArguments.append("-ui-seed-contracts") }
+        return app
     }
 }

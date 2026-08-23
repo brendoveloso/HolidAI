@@ -1,12 +1,12 @@
 import Foundation
 
 // Esse protocolo define as regras para qualquer serviço de feriados no app
-protocol HolidayService {
+protocol HolidayService: Sendable {
     func fetchStates() async throws -> [StateDTO]
     func fetchHolidays(year: Int, country: String, state: String?, city: String?) async throws -> [HolidayDTO]
 }
 
-struct HolidayDTO: Codable {
+struct HolidayDTO: Codable, Sendable {
     let date: String
     let name: String
     let type: String
@@ -20,7 +20,7 @@ struct HolidayDTO: Codable {
     }
 }
 
-struct StateDTO: Codable, Identifiable {
+struct StateDTO: Codable, Identifiable, Sendable {
     var id: String { uf }
     let uf: String
     let name: String
