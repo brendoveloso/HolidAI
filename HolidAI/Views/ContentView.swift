@@ -7,7 +7,7 @@ struct ContentView: View {
     
     var body: some View {
         if let activeContract = contracts.first {
-            DashboardView(contract: activeContract)
+            MainTabView(contract: activeContract)
         } else {
             RegisterView()
         }
