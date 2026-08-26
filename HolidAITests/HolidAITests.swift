@@ -66,10 +66,10 @@ struct HolidAITests {
 
     @Test("Próximo feriado descarta datas passadas")
     func nextHolidayDiscardsPastDates() {
-        let past = occurrence(holiday: holiday(date: date(2026, 8, 1), name: "Passado"))
-        let next = occurrence(holiday: holiday(date: date(2026, 9, 7), name: "Independência"))
-        let later = occurrence(holiday: holiday(date: date(2026, 10, 12), name: "Padroeira"))
-        #expect(HolidayRules.nextHoliday(in: [later, past, next], now: date(2026, 8, 23), calendar: calendar)?.holiday.name == "Independência")
+        let past = occurrence(holiday: holiday(date: holidayDate(2026, 8, 1), name: "Passado"))
+        let next = occurrence(holiday: holiday(date: holidayDate(2026, 9, 7), name: "Independência"))
+        let later = occurrence(holiday: holiday(date: holidayDate(2026, 10, 12), name: "Padroeira"))
+        #expect(HolidayRules.nextHoliday(in: [later, past, next], now: date(2026, 8, 23), timeZone: calendar.timeZone)?.holiday.name == "Independência")
     }
 
     @Test("Feriado compartilhado é consolidado entre contratos")
@@ -92,6 +92,38 @@ struct HolidAITests {
         #expect(service.holidayRequestCount == 1)
     }
 
+    @Test("Data da API preserva o dia do feriado no fuso horário local")
+    func apiDatePreservesLocalCalendarDay() throws {
+        let dto = HolidayDTO(
+            date: "25/12/2026",
+            name: "Natal",
+            type: "Nacional",
+            banking: false
+        )
+        let key = HolidayLocationKey(year: 2026, state: "SP", city: "São Paulo")
+        let holiday = try HolidayMapper.map(dto, key: key)
+
+        #expect(holiday.date == HolidayDate(year: 2026, month: 12, day: 25))
+    }
+
+    @Test("Data do feriado não depende do fuso horário do aparelho")
+    func apiDateDoesNotDependOnDeviceTimeZone() throws {
+        let dto = HolidayDTO(
+            date: "25/12/2026",
+            name: "Natal",
+            type: "Nacional",
+            banking: false
+        )
+        let key = HolidayLocationKey(year: 2026, state: "SP", city: "São Paulo")
+        let holidayDate = try HolidayMapper.map(dto, key: key).date
+        let persistedDate = try JSONDecoder().decode(
+            HolidayDate.self,
+            from: JSONEncoder().encode(holidayDate)
+        )
+
+        #expect(persistedDate == HolidayDate(year: 2026, month: 12, day: 25))
+    }
+
     @Test("Repository só repete uma chave com falha quando retry é solicitado")
     func repositorySelectiveRetry() async throws {
         let service = CountingHolidayService(failuresBeforeSuccess: 1)
@@ -110,7 +142,7 @@ struct HolidAITests {
         let spKey = HolidayLocationKey(year: 2026, state: "SP", city: "São Paulo")
         let rjKey = HolidayLocationKey(year: 2026, state: "RJ", city: "Rio de Janeiro")
         let repository = MockHolidayRepository(results: [
-            spKey: .success([holiday(date: date(2026, 9, 7), name: "Independência", state: "SP", city: "São Paulo")]),
+            spKey: .success([holiday(date: holidayDate(2026, 9, 7), name: "Independência", state: "SP", city: "São Paulo")]),
             rjKey: .failure(URLError(.notConnectedToInternet))
         ])
         let store = HolidayStore(repository: repository, now: { now })
@@ -124,8 +156,8 @@ struct HolidAITests {
         let current = HolidayLocationKey(year: 2026, state: "SP", city: "São Paulo")
         let next = HolidayLocationKey(year: 2027, state: "SP", city: "São Paulo")
         let repository = MockHolidayRepository(results: [
-            current: .success([holiday(date: date(2026, 1, 1), name: "Passado", state: "SP", city: "São Paulo")]),
-            next: .success([holiday(date: date(2027, 1, 1), name: "Ano Novo", year: 2027, state: "SP", city: "São Paulo")])
+            current: .success([holiday(date: holidayDate(2026, 1, 1), name: "Passado", state: "SP", city: "São Paulo")]),
+            next: .success([holiday(date: holidayDate(2027, 1, 1), name: "Ano Novo", year: 2027, state: "SP", city: "São Paulo")])
         ])
         let store = HolidayStore(repository: repository, now: { date(2026, 12, 31) })
         await store.load(contracts: [contract(state: "SP", city: "São Paulo")])
@@ -155,8 +187,12 @@ struct HolidAITests {
         calendar.date(from: DateComponents(year: year, month: month, day: day))!
     }
 
-    private func holiday(date: Date? = nil, name: String, type: String = "Nacional", banking: Bool = false, year: Int = 2026, state: String = "SP", city: String? = "São Paulo") -> Holiday {
-        Holiday(date: date ?? self.date(year, 12, 25), name: name, type: type, appliesToBanking: banking, year: year, state: state, city: city)
+    private func holidayDate(_ year: Int, _ month: Int, _ day: Int) -> HolidayDate {
+        HolidayDate(year: year, month: month, day: day)!
+    }
+
+    private func holiday(date: HolidayDate? = nil, name: String, type: String = "Nacional", banking: Bool = false, year: Int = 2026, state: String = "SP", city: String? = "São Paulo") -> Holiday {
+        Holiday(date: date ?? holidayDate(year, 12, 25), name: name, type: type, appliesToBanking: banking, year: year, state: state, city: city)
     }
 
     private func contract(name: String = "Empresa", state: String = "SP", city: String = "São Paulo", type: EmploymentType = .clt) -> Contract {

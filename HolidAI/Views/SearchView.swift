@@ -19,7 +19,7 @@ struct SearchView: View {
                         Section("Feriados") {
                             ForEach(results.holidays) { occurrence in
                                 Button { router.openHoliday(occurrence.id) } label: {
-                                    HolidayRow(occurrence: occurrence, isPast: occurrence.holiday.date < Calendar.current.startOfDay(for: Date()))
+                                    HolidayRow(occurrence: occurrence, isPast: occurrence.holiday.date < HolidayDate(Date()))
                                 }.buttonStyle(.plain)
                             }
                         }

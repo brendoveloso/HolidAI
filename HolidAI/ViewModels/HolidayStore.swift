@@ -34,7 +34,7 @@ final class HolidayStore {
         if occurrences.isEmpty { isLoading = true } else { isRefreshing = refresh }
         defer { isLoading = false; isRefreshing = false }
 
-        let year = Calendar.current.component(.year, from: now())
+        let year = HolidayDate(now()).year
         await fetch(keys: Set(activeContracts.map { key(for: $0, year: year) }), retry: refresh)
         rebuild(using: activeContracts)
 

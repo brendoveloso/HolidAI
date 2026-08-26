@@ -31,9 +31,9 @@ struct HolidayRow: View {
     var body: some View {
         HStack(spacing: 14) {
             VStack(spacing: 1) {
-                Text(occurrence.holiday.date, format: .dateTime.day(.twoDigits))
+                Text(occurrence.holiday.date.formatted(template: "dd"))
                     .font(.title3.bold())
-                Text(occurrence.holiday.date, format: .dateTime.month(.abbreviated))
+                Text(occurrence.holiday.date.formatted(template: "MMM"))
                     .font(.caption2.bold())
                     .textCase(.uppercase)
                     .foregroundStyle(.secondary)
@@ -70,7 +70,7 @@ struct NextHolidayCard: View {
                 .foregroundStyle(.tint)
             Text(occurrence.holiday.name)
                 .font(.title2.bold())
-            Text(occurrence.holiday.date.formatted(.dateTime.weekday(.wide).day().month(.wide).year()))
+            Text(occurrence.holiday.date.formatted(dateStyle: .full))
                 .foregroundStyle(.secondary)
             HStack {
                 HolidayTypeBadge(type: occurrence.holiday.type)
@@ -89,8 +89,7 @@ struct NextHolidayCard: View {
     }
 
     private var daysRemainingText: String {
-        let calendar = Calendar.current
-        let days = calendar.dateComponents([.day], from: calendar.startOfDay(for: now), to: calendar.startOfDay(for: occurrence.holiday.date)).day ?? 0
+        let days = HolidayDate(now).days(until: occurrence.holiday.date)
         return days == 0 ? "Hoje" : "Faltam \(days) dias"
     }
 

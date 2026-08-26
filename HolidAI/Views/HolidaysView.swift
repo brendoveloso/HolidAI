@@ -26,7 +26,7 @@ struct HolidaysView: View {
                             Section(group.title) {
                                 ForEach(group.items) { occurrence in
                                     NavigationLink(value: HolidayRoute.detail(occurrence.id)) {
-                                        HolidayRow(occurrence: occurrence, isPast: occurrence.holiday.date < Calendar.current.startOfDay(for: Date()))
+                                        HolidayRow(occurrence: occurrence, isPast: occurrence.holiday.date < HolidayDate(Date()))
                                     }
                                     .id(occurrence.id)
                                 }
@@ -68,12 +68,11 @@ struct HolidaysView: View {
 
     private var filteredOccurrences: [HolidayOccurrence] { store.occurrences(for: selectedContractID) }
 
-    private var monthGroups: [(month: Date, title: String, items: [HolidayOccurrence])] {
-        let calendar = Calendar.current
+    private var monthGroups: [(month: HolidayDate, title: String, items: [HolidayOccurrence])] {
         return Dictionary(grouping: filteredOccurrences) {
-            calendar.date(from: calendar.dateComponents([.year, .month], from: $0.holiday.date)) ?? $0.holiday.date
+            HolidayDate(year: $0.holiday.date.year, month: $0.holiday.date.month, day: 1)!
         }.map { month, items in
-            (month, month.formatted(.dateTime.month(.wide).year()), items.sorted { $0.holiday.date < $1.holiday.date })
+            (month, month.formatted(template: "MMMM yyyy"), items.sorted { $0.holiday.date < $1.holiday.date })
         }.sorted { $0.month < $1.month }
     }
 }
@@ -84,7 +83,7 @@ struct HolidayDetailView: View {
     var body: some View {
         if let occurrence {
             List {
-                LabeledContent("Data", value: occurrence.holiday.date.formatted(date: .long, time: .omitted))
+                LabeledContent("Data", value: occurrence.holiday.date.formatted(dateStyle: .long))
                 LabeledContent("Tipo", value: occurrence.holiday.type)
                 LabeledContent("Localização", value: [occurrence.holiday.city, occurrence.holiday.state].compactMap { $0 }.joined(separator: ", "))
                 Section("Contratos") { ForEach(occurrence.contractNames, id: \.self) { Text($0) } }

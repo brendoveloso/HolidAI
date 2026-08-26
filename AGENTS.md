@@ -6,6 +6,13 @@ HolidAI is a native iOS app that helps users understand which holidays apply to 
 
 The product is early-stage. Prefer simple solutions that support iteration over premature abstractions.
 
+### Holiday date semantics
+
+- A holiday is a Gregorian civil date, not an instant in time. Its identity and persisted value must contain only year, month, and day, with no time or time zone.
+- A holiday returned as `25/12/2026` must remain `25/12/2026` regardless of the device's locale, calendar, time zone, or the user's physical location.
+- Do not model or persist holiday dates with `Foundation.Date`. Converting to `Date` is allowed only as an encapsulated, transient bridge for framework APIs, and must not affect business rules, equality, ordering, identity, or persistence.
+- The device time zone may be used to determine the user's current civil date ("today"), but never to reinterpret a holiday's date.
+
 ## Engineering
 
 - Use Swift and SwiftUI for iOS development.
