@@ -22,13 +22,12 @@ enum HolidayRules {
         }
     }
 
-    static func nextHoliday(in occurrences: [HolidayOccurrence], now: Date, calendar: Calendar = .current) -> HolidayOccurrence? {
-        let today = calendar.startOfDay(for: now)
+    static func nextHoliday(in occurrences: [HolidayOccurrence], now: Date, timeZone: TimeZone = .autoupdatingCurrent) -> HolidayOccurrence? {
+        let today = HolidayDate(now, timeZone: timeZone)
         return occurrences.filter { $0.holiday.date >= today }.min { $0.holiday.date < $1.holiday.date }
     }
 
     private static func consolidationKey(for holiday: Holiday) -> String {
-        let components = Calendar(identifier: .gregorian).dateComponents([.year, .month, .day], from: holiday.date)
-        return "\(components.year ?? 0)-\(components.month ?? 0)-\(components.day ?? 0)|\(holiday.name.normalizedForSearch)|\(holiday.type.normalizedForSearch)"
+        "\(holiday.date.storageValue)|\(holiday.name.normalizedForSearch)|\(holiday.type.normalizedForSearch)"
     }
 }

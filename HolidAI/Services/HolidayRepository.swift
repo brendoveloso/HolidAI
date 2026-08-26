@@ -69,7 +69,9 @@ enum HolidayRepositoryError: Error, LocalizedError {
 
 enum HolidayMapper {
     static func map(_ dto: HolidayDTO, key: HolidayLocationKey) throws -> Holiday {
-        guard let date = parseDate(dto.date) else { throw HolidayRepositoryError.invalidDate(dto.date) }
+        guard let date = HolidayDate(apiValue: dto.date) else {
+            throw HolidayRepositoryError.invalidDate(dto.date)
+        }
         return Holiday(
             date: date,
             name: dto.name,
@@ -79,18 +81,6 @@ enum HolidayMapper {
             state: key.state,
             city: key.city
         )
-    }
-
-    private static func parseDate(_ value: String) -> Date? {
-        for separator in ["/", "-"] {
-            let formatter = DateFormatter()
-            formatter.calendar = Calendar(identifier: .gregorian)
-            formatter.locale = Locale(identifier: "en_US_POSIX")
-            formatter.timeZone = TimeZone(secondsFromGMT: 0)
-            formatter.dateFormat = "dd\(separator)MM\(separator)yyyy"
-            if let date = formatter.date(from: value) { return date }
-        }
-        return nil
     }
 }
 
